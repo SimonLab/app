@@ -1,75 +1,57 @@
-#!/usr/bin/env ruby 
-require 'octokit'
-require 'json'
 require 'optparse'
+require 'octokit'
 
-class App
+class Application
   VERSION = '0.0.1'
-  def initialize(arguments)
-    @args = arguments
-    @options = {}
+
+  def initialize(args)
+    @arguments = args
   end
   
   def run
-    if arguments_valid? && parsed_options?
-      puts "ok lets go"
+    if valid_arguments?
+      parse_option
     else
-      puts "wrong number arguments"
+      raise "wrong arguments, see -h for help"
     end
   end
 
+protected
 
+  def valid_arguments?
+    #not very nice
+    arg_option = @arguments[0]
+    case @arguments.length
+    when 1
+      #is it an option?
+      /^-/ =~ arg_option
+    when 2
+      #is it the option -u or --user
+      /(^-u$|^--user$)/ =~ arg_option
+    else
+      false
+    end  
+  end
 
-  protected
-
-    def parsed_options?
-      # Specify options
-      opts = OptionParser.new 
-      opts.on('-v', '--version')    { version ; exit 0 }
-     # opts.on('-h', '--help')       { output_help }
-      #opts.on('-V', '--verbose')    { @options.verbose = true }  
-     # opts.on('-q', '--quiet')      { @options.quiet = true }
-      # TO DO - add additional options
-            
-      opts.parse!(@arguments) rescue return false
-      
-      process_options
-      true      
+  def parse_option
+    opts = OptionParser.new
+    opts.banner = "List of valid commads:"
+    opts.on("-h", "--help") do
+      puts opts
+      exit 0;
     end
+  
+    opts.on("-u", "--user USER") do |user|
+      find_user(user)
+    end
+    opts.parse!(ARGV)
+  end
 
-    def version
-      puts "version: #{VERSION}"
-    end
-      
-    def arguments_valid?
-      if @args.length == 1
-        true
-      else
-        false
-      end
-    end
-
-    def user_valid?
-      #check if the user is in github
-      #check if there is limit length to username
-    end
-
-    def favorite_language(user)
-      #getLanguage
-      #return the language(s) most used
-    end
+  def find_user(user)
+    puts "Hey find the user: #{user}"
+  end
+  
 end
 
-app = App.new(ARGV)
+app = Application.new(ARGV)
 app.run
-=begin
-puts "username"
-userN = gets.chomp
-test = JSON.parse '{"test": "ok"}'
-if (user = Octokit.user userN)
-  puts user.name
-else
-  puts "The user doesn't exist"
-end
-
-=end
