@@ -19,7 +19,6 @@ class Application
 protected
 
   def valid_arguments?
-    #not very nice
     arg_option = @arguments[0]
     case @arguments.length
     when 1
@@ -38,20 +37,38 @@ protected
     opts.banner = "List of valid commads:"
     opts.on("-h", "--help") do
       puts opts
-      exit 0;
+      exit 0
+    end
+    opts.on("-v", "--version") do
+      puts VERSION
+      exit 0
     end
   
     opts.on("-u", "--user USER") do |user|
       find_user(user)
     end
-    opts.parse!(ARGV)
+     opts.parse!(ARGV)  
   end
 
   def find_user(user)
-    puts "Hey find the user: #{user}"
+    begin
+      users = Octokit.user(user)
+      p users
+    rescue Octokit::NotFound => e
+      p e
+      exit 1
+    end
+  end
+
+  def user_exist?
+
   end
   
 end
 
+begin
 app = Application.new(ARGV)
 app.run
+rescue => e
+  p e
+end
