@@ -9,10 +9,11 @@ class Application
   end
   
   def run
-    if valid_arguments?
-      parse_option
-    else
-      raise "wrong arguments, see -h for help"
+    begin
+      valid_arguments? ? parse_option : raise("Wrong arguments")
+    rescue => e
+      "Problem"# check wich problem
+      exit
     end
   end
 
@@ -34,7 +35,7 @@ protected
 
   def parse_option
     opts = OptionParser.new
-    opts.banner = "List of valid commads:"
+    opts.banner = "List of options:"
     opts.on("-h", "--help") do
       puts opts
       exit 0
@@ -53,10 +54,10 @@ protected
   def favorite_language(user)
     begin
       username = get_username(user)
-      list = list_languages(username)
-      p list.max
+      list_lang = list_languages(username)
+      p list_lang.max
     rescue  => e
-      p e
+      p e.message
       exit 1
     end
   end
@@ -77,11 +78,13 @@ protected
       user = Octokit.user(user)
     rescue Octokit::NotFound => e
       puts e.message
+      exit 1
     end
     user.login
   end
 
   def get_languages(user, repository)
+    #if no languages it returns {}
     languages = Octokit.languages("#{user}/#{repository}")
   end
 
@@ -91,13 +94,10 @@ protected
     repos.each do |repo|
       languages = get_languages(user,repo)
       languages.each do |lang, size|
-        if (list_lang.has_key? lang)
-          list_lang[lang] += size
-        else
-          list_lang[lang] = size
-        end
+        list_lang.has_key?(lang) ? (list_lang[lang] += size) : (list_lang[lang] = size)
       end
     end
+    raise "No languages find" if list_lang.empty?
     list_lang
   end
 end
