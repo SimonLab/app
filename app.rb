@@ -9,24 +9,20 @@ class Application
   end
   
   def run
-    begin
-      valid_arguments? ? parse_option : raise("Wrong arguments")
-    rescue => e
-      "Problem"# check wich problem
-      exit
-    end
+    valid_arguments? ? parse_option : raise("Wrong arguments")
   end
 
 protected
 
   def valid_arguments?
+    first_arg = @arguments[0]
     case @arguments.length
     when 1
       #is it an option?
-      /^-/ =~ @argument[0]
+      /^-/ =~ first_arg
     when 2
       #is it the option -u or --user
-      /(^-u$|^--user$)/ =~ @argument[0]
+      /(^-u$|^--user$)/ =~ first_arg
     else
       false
     end  
@@ -103,9 +99,7 @@ protected
   end
 end
 
-begin
+
 app = Application.new(ARGV)
 app.run
-rescue => e
-  p e
-end
+
