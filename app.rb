@@ -45,25 +45,61 @@ protected
     end
   
     opts.on("-u", "--user USER") do |user|
-      find_user(user)
+      favorite_language(user)
     end
      opts.parse!(ARGV)  
   end
 
-  def find_user(user)
+  def favorite_language(user)
     begin
-      users = Octokit.user(user)
-      p users
-    rescue Octokit::NotFound => e
+      username = get_username(user)
+      list = list_languages(username)
+      p list.max
+    rescue  => e
       p e
       exit 1
     end
   end
 
-  def user_exist?
-
+  def name_repositories(user)
+    repositories = Octokit.repositories(user)
+    names_repo = []
+    repositories.each do |repo|
+      names_repo << repo.name
+    end
+    raise "No repositories" if names_repo.empty?
+    names_repo
   end
   
+  
+  def get_username(user)
+    begin
+      user = Octokit.user(user)
+    rescue Octokit::NotFound => e
+      puts e.message
+    end
+    user.login
+  end
+
+  def get_languages(user, repository)
+    languages = Octokit.languages("#{user}/#{repository}")
+  end
+
+  def list_languages(user)
+    repos = name_repositories(user)
+    list_lang = {}
+    repos.each do |repo|
+      languages = get_languages(user,repo)
+      languages.each do |lang, size|
+        if (list_lang.has_key? lang)
+          list_lang[lang] += size
+        else
+          list_lang[lang] = size
+        end
+      end
+    end
+    list_lang
+  end
 end
 
 begin
