@@ -1,3 +1,22 @@
+# == Synopsis 
+#   The application allow to find what is the favorite language of a user on Github.
+#   It use the GitHub API with the Octokit wrapper for Ruby
+# == Examples
+#   This command return the name of the favorite language and the size of bytes written with this language.
+#     app.rb -u loginUserGithub
+#
+# == Options
+#   -h, --help          Displays help message
+#   -v, --version       Display the version, then exit
+#   -u, --user LOGIN    Display the favorite language and the size in bytes
+#
+# == Author
+#   Simon Labondance
+#
+# == Copyright
+#   GNU General Public License for
+#   see <http://www.gnu.org/licenses/>.
+
 require 'optparse'
 require 'octokit'
 
@@ -5,14 +24,13 @@ class Application
   VERSION = '0.0.1'
 
   def initialize(args)
-    #client = Octokit::Client.new(:access_token => "yourTokern") if the limit of guest request is too small
     @arguments = args
   end
   
   def run
-    valid_arguments? ? parse_option : raise(ArgumentError,"Wrong arguments")
+    valid_arguments? ? parse_option : raise(ArgumentError,"Wrong number of arguments")
   rescue ArgumentError => e
-    abort "Error: #{e.message}"
+    abort e.message
   end
 
 protected
@@ -60,7 +78,7 @@ protected
     repositories.each do |repo|
       names_repo << repo.name
     end
-    raise RuntimeError,"The user #{user} doesn't have any repositories" if (names_repo.empty?)
+    raise RuntimeError,"The user #{user} doesn't have any repositories" if names_repo.empty?
     names_repo
     rescue RuntimeError => e
       abort e.message
@@ -92,11 +110,12 @@ protected
   rescue RuntimeError => e
     abort e.message
   end
+
 end
 
 app = Application.new(ARGV)
 begin
 app.run
 rescue Octokit::TooManyRequests => e
-  abort "#{e.message}\nuncomment and add your github token to the line begining with client =... in initialize method"
+  abort "#{e.message}"
 end
