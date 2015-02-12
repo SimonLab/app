@@ -54,6 +54,7 @@ protected
     begin
       username = get_username(user)
       list_lang = list_languages(username)
+      #better display 
       p list_lang.max
     rescue  => e
       p e.message
