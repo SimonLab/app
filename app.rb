@@ -40,7 +40,7 @@ protected
     case @arguments.length
     when 1
       #is it an option?
-      /^-/ =~ first_arg
+      /^-*/ =~ first_arg
     when 2
       #is it the option -u or --user
       /(^-u$|^--user$)/ =~ first_arg
@@ -61,7 +61,9 @@ protected
     opts.on("-u", "--user USER") do |user|
       favorite_language(user)
     end
-     opts.parse!(ARGV)  
+    opts.parse!(ARGV)
+  rescue OptionParser::InvalidOption => e
+    abort e.message
   end
 
   def favorite_language(user)
