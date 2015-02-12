@@ -20,14 +20,13 @@ class Application
 protected
 
   def valid_arguments?
-    arg_option = @arguments[0]
     case @arguments.length
     when 1
       #is it an option?
-      /^-/ =~ arg_option
+      /^-/ =~ @argument[0]
     when 2
       #is it the option -u or --user
-      /(^-u$|^--user$)/ =~ arg_option
+      /(^-u$|^--user$)/ =~ @argument[0]
     else
       false
     end  
@@ -91,6 +90,7 @@ protected
   def list_languages(user)
     repos = name_repositories(user)
     list_lang = {}
+    #use thread for the api request?
     repos.each do |repo|
       languages = get_languages(user,repo)
       languages.each do |lang, size|
