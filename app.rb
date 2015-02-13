@@ -26,7 +26,7 @@ class Application
   def initialize(args)
     @arguments = args
   end
-  
+  #check and parse options and arguments
   def run
     valid_arguments? ? parse_option : raise(ArgumentError,"Wrong number of arguments")
   rescue ArgumentError => e
@@ -34,7 +34,9 @@ class Application
   end
 
 protected
-
+  #correct number args: 1 or 2
+  #correct option start with -
+  #if number arg is 2 correct option is -u or -user
   def valid_arguments?
     first_arg = @arguments[0]
     case @arguments.length
@@ -48,7 +50,7 @@ protected
       false
     end  
   end
-
+  #link actions to arguments and options
   def parse_option
     opts = OptionParser.new
     opts.banner = "List of options:"
@@ -65,7 +67,7 @@ protected
   rescue OptionParser::InvalidOption => e
     abort e.message
   end
-
+  
   def favorite_language(user)
     username = get_username(user)
     list_lang = list_languages(username)
@@ -97,7 +99,8 @@ protected
   def get_languages(user, repository)
     languages = Octokit.languages("#{user}/#{repository}")
   end
-
+  #create a hash with has for key the language and value the size in
+  #bytes use by the language
   def list_languages(user)
     repos = name_repositories(user)
     list_lang = {}
