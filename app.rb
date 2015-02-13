@@ -40,7 +40,7 @@ protected
     case @arguments.length
     when 1
       #is it an option?
-      /^-*/ =~ first_arg
+      /^-/ =~ first_arg
     when 2
       #is it the option -u or --user
       /(^-u$|^--user$)/ =~ first_arg
